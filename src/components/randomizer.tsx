@@ -140,12 +140,14 @@ export default function Randomizer() {
       setResult(newResult);
       setIsRolling(false);
 
-      if (selectedDifficulty.skulls === 6) {
+      if (selectedDifficulty.name === 'Смертный приговор') {
         setShowOneDownEffect(true);
         setTimeout(() => setShowOneDownEffect(false), 2000);
       }
     }, 1000);
   };
+
+  const isOneDown = result?.difficulty.name === 'Смертный приговор';
 
   return (
     <>
@@ -244,20 +246,31 @@ export default function Randomizer() {
                     </p>
                     <div className="flex gap-1.5">
                       {[...Array(result.difficulty.skulls)].map((_, i) => (
-                        <Skull
-                          key={i}
-                          className={`w-5 h-5 ${
-                            result.difficulty.skulls >= 5 ? 'text-red-500 fill-red-500/60 animate-pulse' : 'text-gray-400 fill-gray-400/30'
-                          }`}
-                        />
+                        <div key={i} className="relative" title={isOneDown && i === 5 ? "Одно падение" : undefined}>
+                          <Skull className={`w-5 h-5 ${
+                            isOneDown ? 'text-red-500 fill-red-500/60 animate-pulse' : 'text-gray-400 fill-gray-400/30'
+                          }`} />
+                          {isOneDown && i === 5 && (
+                            <span className="absolute -top-1 -right-1 text-xs font-bold text-white bg-red-600 rounded-full w-4 h-4 flex items-center justify-center">
+                              1
+                            </span>
+                          )}
+                        </div>
                       ))}
                     </div>
                   </div>
-                  <p className={`text-xs mt-2 ${
-                    result.difficulty.color === 'red' ? 'text-red-400 font-semibold' : 'text-gray-400'
-                  }`}>
-                    {result.difficulty.description}
-                  </p>
+                  <div className="mt-2">
+                    <p className={`text-xs ${
+                      result.difficulty.color === 'red' ? 'text-red-400 font-semibold' : 'text-gray-400'
+                    }`}>
+                      {result.difficulty.description}
+                    </p>
+                    {isOneDown && (
+                      <p className="text-xs text-red-300 mt-1">
+                        <span className="font-semibold">Одно падение:</span> После возрождения вы не сможете восстановиться
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
