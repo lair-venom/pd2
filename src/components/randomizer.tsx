@@ -45,6 +45,12 @@ const difficulties = [
     skulls: 6,
     color: 'red',
     description: 'Худший сценарий'
+  },
+  {
+    name: 'Одно падение',
+    skulls: 7,
+    color: 'red',
+    description: 'Одна ошибка и конец'
   }
 ];
 
@@ -140,7 +146,7 @@ export default function Randomizer() {
       setResult(newResult);
       setIsRolling(false);
 
-      if (selectedDifficulty.skulls >= 5) {
+      if (selectedDifficulty.name === 'Одно падение') {
         setShowOneDownEffect(true);
         setTimeout(() => setShowOneDownEffect(false), 2000);
       }
