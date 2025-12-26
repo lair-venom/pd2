@@ -88,14 +88,14 @@ export default function Settings({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
-      <div className="relative w-full max-w-3xl max-h-[85vh] bg-[#1e1e24] rounded-2xl border border-orange-500/30 shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-3xl max-h-[85vh] bg-[#1e1e24] rounded-2xl border border-orange-500/ shadow-2xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-orange-500/5"></div>
 
         <div className="relative">
           <div className="sticky top-0 bg-[#1e1e24]/95 backdrop-blur-sm border-b border-orange-500/20 px-6 py-4 z-10">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-orange-500/10 rounded-lg border border-orange-500/30">
+                <div className="p-2 bg-orange-500/10 rounded-lg border border-orange-500/">
                   <SettingsIcon className="w-6 h-6 text-orange-400" />
                 </div>
                 <h2 className="text-2xl font-bold text-white">Настройки миссий</h2>
@@ -172,7 +172,7 @@ export default function Settings({
                       <span className="font-bold text-lg text-white">Одно падение</span>
                       {oneDownEnabled && (
                         <span className="px-2 py-0.5 bg-red-500/20 text-red-300 text-xs font-bold rounded-full border border-red-500/30">
-                          30% шанс
+                          20% шанс
                         </span>
                       )}
                     </div>
