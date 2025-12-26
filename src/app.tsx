@@ -26,7 +26,7 @@ function App() {
       </div>
 
       <footer className="relative z-10 mt-12 text-center text-orange-200/50 text-base">
-        <p>Нажми кнопку, чтобы получить случайную конфигурацию миссии</p>
+
       </footer>
     </div>
   );
