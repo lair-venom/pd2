@@ -146,7 +146,7 @@ export default function Randomizer() {
       setResult(newResult);
       setIsRolling(false);
 
-      if (selectedDifficulty.name === 'Одно падение') {
+      if (selectedDifficulty.name === 'Смертный приговор +1') {
         setShowOneDownEffect(true);
         setTimeout(() => setShowOneDownEffect(false), 2000);
       }
