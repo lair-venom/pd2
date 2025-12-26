@@ -47,7 +47,7 @@ const difficulties = [
     description: 'Худший сценарий'
   },
   {
-    name: 'Одно падение',
+    name: 'Смертный приговор +1',
     skulls: 7,
     color: 'red',
     description: 'Одна ошибка и конец'
@@ -146,7 +146,7 @@ export default function Randomizer() {
       setResult(newResult);
       setIsRolling(false);
 
-      if (selectedDifficulty.name === 'Смертный приговор +1') {
+      if (selectedDifficulty.name === 'Одно падение') {
         setShowOneDownEffect(true);
         setTimeout(() => setShowOneDownEffect(false), 2000);
       }
