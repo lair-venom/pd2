@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Search, Check, Settings as SettingsIcon } from 'lucide-react';
+import { X, Search, Check, Settings as SettingsIcon, Skull } from 'lucide-react';
 
 interface Heist {
   name: string;
@@ -17,14 +17,24 @@ interface SettingsProps {
   heists: Heist[];
   difficulties: Difficulty[];
   onClose: () => void;
-  onSave: (selectedHeists: string[], selectedDifficulties: string[]) => void;
+  onSave: (selectedHeists: string[], selectedDifficulties: string[], oneDownEnabled: boolean) => void;
   initialSelected: string[];
   initialDifficulties: string[];
+  initialOneDown: boolean;
 }
 
-export default function Settings({ heists, difficulties, onClose, onSave, initialSelected, initialDifficulties }: SettingsProps) {
+export default function Settings({ 
+  heists, 
+  difficulties, 
+  onClose, 
+  onSave, 
+  initialSelected, 
+  initialDifficulties,
+  initialOneDown 
+}: SettingsProps) {
   const [selectedHeists, setSelectedHeists] = useState<Set<string>>(new Set(initialSelected));
   const [selectedDifficulties, setSelectedDifficulties] = useState<Set<string>>(new Set(initialDifficulties));
+  const [oneDownEnabled, setOneDownEnabled] = useState<boolean>(initialOneDown);
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredHeists = heists.filter(heist =>
@@ -51,11 +61,15 @@ export default function Settings({ heists, difficulties, onClose, onSave, initia
     setSelectedDifficulties(newSelected);
   };
 
-  const selectAll = () => {
+  const toggleOneDown = () => {
+    setOneDownEnabled(!oneDownEnabled);
+  };
+
+  const selectAllHeists = () => {
     setSelectedHeists(new Set(heists.map(h => h.name)));
   };
 
-  const deselectAll = () => {
+  const deselectAllHeists = () => {
     setSelectedHeists(new Set());
   };
 
@@ -68,7 +82,7 @@ export default function Settings({ heists, difficulties, onClose, onSave, initia
   };
 
   const handleSave = () => {
-    onSave(Array.from(selectedHeists), Array.from(selectedDifficulties));
+    onSave(Array.from(selectedHeists), Array.from(selectedDifficulties), oneDownEnabled);
     onClose();
   };
 
@@ -107,13 +121,13 @@ export default function Settings({ heists, difficulties, onClose, onSave, initia
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={selectAll}
+                  onClick={selectAllHeists}
                   className="px-4 py-2 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 rounded-lg text-orange-300 text-sm font-medium transition-colors whitespace-nowrap"
                 >
                   Выбрать все
                 </button>
                 <button
-                  onClick={deselectAll}
+                  onClick={deselectAllHeists}
                   className="px-4 py-2 bg-[#2a2a32] hover:bg-[#32323a] border border-orange-500/20 rounded-lg text-orange-300 text-sm font-medium transition-colors whitespace-nowrap"
                 >
                   Снять все
@@ -131,6 +145,51 @@ export default function Settings({ heists, difficulties, onClose, onSave, initia
           </div>
 
           <div className="overflow-y-auto max-h-[50vh] px-6 py-4 custom-scrollbar space-y-6">
+            {/* Настройка "Одно падение" */}
+            <div>
+              <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <Skull className="w-5 h-5 text-red-400" />
+                Дополнительные настройки
+              </h3>
+              <div className="space-y-4">
+                <button
+                  onClick={toggleOneDown}
+                  className={`group relative flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 w-full ${
+                    oneDownEnabled
+                      ? 'bg-red-500/10 border-red-500/40 hover:bg-red-500/15'
+                      : 'bg-[#2a2a32] border-red-500/10 hover:border-red-500/30 hover:bg-[#2a2a32]/80'
+                  }`}
+                >
+                  <div className={`flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
+                    oneDownEnabled
+                      ? 'bg-red-500 border-red-500'
+                      : 'border-red-500/30 group-hover:border-red-500/50'
+                  }`}>
+                    {oneDownEnabled && <Check className="w-4 h-4 text-[#1e1e24]" strokeWidth={3} />}
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-bold text-lg text-white">Одно падение</span>
+                      {oneDownEnabled && (
+                        <span className="px-2 py-0.5 bg-red-500/20 text-red-300 text-xs font-bold rounded-full border border-red-500/30">
+                          50% шанс
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm text-gray-300">Включает шанс выпадения правила "Одно падение" для любой сложности</p>
+                      <p className="text-xs text-red-300/60">
+                        При активации: после возрождения вы не сможете восстановиться
+                      </p>
+                    </div>
+                  </div>
+                  <Skull className={`w-6 h-6 ${oneDownEnabled ? 'text-red-500 fill-red-500/60 animate-pulse' : 'text-gray-500 fill-gray-500/20'}`} />
+                </button>
+              </div>
+            </div>
+
+            <div className="h-px bg-orange-500/20"></div>
+
             <div>
               <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                 Выберите сложность
