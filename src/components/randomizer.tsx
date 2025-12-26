@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Dices, Target, Shield, Volume2, Skull, Home, Settings as SettingsIcon } from 'lucide-react';
+import { Dices, Target, Shield, Volume2, Skull, Home, Settings as SettingsIcon, Check } from 'lucide-react';
 import Settings from './settings';
 import { heists, type Heist } from '../data/heists';
 
@@ -44,7 +44,7 @@ const difficulties = [
     name: 'Смертный приговор',
     skulls: 6,
     color: 'red',
-    description: 'Худший сценарий - Одно падение'
+    description: 'Худший сценарий'
   }
 ];
 
@@ -58,10 +58,12 @@ type Result = {
   difficulty: { name: string; skulls: number; color: string; description: string };
   heist: Heist;
   approach: { name: string; icon: string; value: string };
+  isOneDown: boolean;
 };
 
 const STORAGE_KEY = 'payday2-selected-heists';
 const STORAGE_KEY_DIFFICULTIES = 'payday2-selected-difficulties';
+const STORAGE_KEY_ONE_DOWN = 'payday2-one-down-enabled';
 
 export default function Randomizer() {
   const [result, setResult] = useState<Result | null>(null);
@@ -70,8 +72,10 @@ export default function Randomizer() {
   const [selectedHeists, setSelectedHeists] = useState<string[]>([]);
   const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>([]);
   const [showOneDownEffect, setShowOneDownEffect] = useState(false);
+  const [oneDownEnabled, setOneDownEnabled] = useState(false);
 
   useEffect(() => {
+    // Загрузка сохраненных миссий
     const storedHeists = localStorage.getItem(STORAGE_KEY);
     if (storedHeists) {
       try {
@@ -84,6 +88,7 @@ export default function Randomizer() {
       setSelectedHeists(heists.map(h => h.name));
     }
 
+    // Загрузка сохраненных сложностей
     const storedDifficulties = localStorage.getItem(STORAGE_KEY_DIFFICULTIES);
     if (storedDifficulties) {
       try {
@@ -95,6 +100,12 @@ export default function Randomizer() {
     } else {
       setSelectedDifficulties(difficulties.map(d => d.name));
     }
+
+    // Загрузка настройки "Одно падение"
+    const storedOneDown = localStorage.getItem(STORAGE_KEY_ONE_DOWN);
+    if (storedOneDown !== null) {
+      setOneDownEnabled(JSON.parse(storedOneDown));
+    }
   }, []);
 
   const handleSaveSettings = (selected: string[], selectedDiffs: string[]) => {
@@ -102,6 +113,12 @@ export default function Randomizer() {
     setSelectedDifficulties(selectedDiffs);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(selected));
     localStorage.setItem(STORAGE_KEY_DIFFICULTIES, JSON.stringify(selectedDiffs));
+  };
+
+  const toggleOneDown = () => {
+    const newValue = !oneDownEnabled;
+    setOneDownEnabled(newValue);
+    localStorage.setItem(STORAGE_KEY_ONE_DOWN, JSON.stringify(newValue));
   };
 
   const randomize = () => {
@@ -131,23 +148,26 @@ export default function Randomizer() {
 
       const selectedHeist = filteredHeists[Math.floor(Math.random() * filteredHeists.length)];
 
+      // Решаем, будет ли включено "Одно падение"
+      const willHaveOneDown = oneDownEnabled && Math.random() < 0.5; // 50% шанс если включена галочка
+
       const newResult: Result = {
         difficulty: selectedDifficulty,
         heist: selectedHeist,
-        approach: selectedApproach
+        approach: selectedApproach,
+        isOneDown: willHaveOneDown
       };
 
       setResult(newResult);
       setIsRolling(false);
 
-      if (selectedDifficulty.name === 'Смертный приговор') {
+      // Показываем эффект только если выпало "Одно падение"
+      if (willHaveOneDown) {
         setShowOneDownEffect(true);
         setTimeout(() => setShowOneDownEffect(false), 2000);
       }
     }, 1000);
   };
-
-  const isOneDown = result?.difficulty.name === 'Смертный приговор';
 
   return (
     <>
@@ -164,26 +184,54 @@ export default function Randomizer() {
 
       <div className="w-full max-w-2xl">
         <div className="flex flex-col gap-3 mb-8">
-          <button
-            onClick={randomize}
-            disabled={isRolling || selectedHeists.length === 0 || selectedDifficulties.length === 0}
-            className="group relative w-full px-8 py-5 bg-gradient-to-r from-orange-500 to-orange-600 text-[#1e1e24] font-bold text-2xl rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-orange disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <div className="absolute inset-0 bg-orange-400 blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
-            <div className="relative flex items-center justify-center gap-3">
-              <Dices className={`w-8 h-8 ${isRolling ? 'animate-spin' : ''}`} />
-              <span>{isRolling ? 'Роллим...' : 'Случайная миссия'}</span>
-            </div>
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={randomize}
+              disabled={isRolling || selectedHeists.length === 0 || selectedDifficulties.length === 0}
+              className="group relative flex-1 px-8 py-5 bg-gradient-to-r from-orange-500 to-orange-600 text-[#1e1e24] font-bold text-2xl rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-orange disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute inset-0 bg-orange-400 blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+              <div className="relative flex items-center justify-center gap-3">
+                <Dices className={`w-8 h-8 ${isRolling ? 'animate-spin' : ''}`} />
+                <span>{isRolling ? 'Роллим...' : 'Случайная миссия'}</span>
+              </div>
+            </button>
 
+            <button
+              onClick={() => setShowSettings(true)}
+              className="group relative w-16 bg-[#2a2a32] hover:bg-[#32323a] border border-orange-500/30 hover:border-orange-500/50 rounded-xl transition-all duration-300 flex items-center justify-center"
+              title="Настройки миссий"
+            >
+              <SettingsIcon className="w-8 h-8 text-orange-400 group-hover:rotate-90 transition-transform duration-300" />
+            </button>
+          </div>
+
+          {/* Переключатель "Одно падение" */}
           <button
-            onClick={() => setShowSettings(true)}
-            className="group relative w-full px-6 py-4 bg-[#2a2a32] hover:bg-[#32323a] border border-orange-500/30 hover:border-orange-500/50 rounded-xl transition-all duration-300 flex items-center justify-center gap-3"
-            title="Настройки миссий"
+            onClick={toggleOneDown}
+            className={`group relative w-full px-6 py-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 border ${
+              oneDownEnabled 
+                ? 'bg-red-500/10 border-red-500/50 hover:border-red-500/70' 
+                : 'bg-[#2a2a32] border-red-500/20 hover:border-red-500/30'
+            }`}
           >
-            <SettingsIcon className="w-6 h-6 text-orange-400 group-hover:rotate-90 transition-transform duration-300" />
-            <span className="font-medium text-lg text-orange-300">Настройки</span>
+            <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all duration-300 ${
+              oneDownEnabled 
+                ? 'bg-red-500 border-red-500' 
+                : 'bg-transparent border-gray-500'
+            }`}>
+              {oneDownEnabled && <Check className="w-4 h-4 text-white" />}
+            </div>
+            <div className="flex flex-col items-start">
+              <span className={`font-bold text-lg ${oneDownEnabled ? 'text-red-300' : 'text-gray-300'}`}>
+                Одно падение
+              </span>
+              <span className="text-xs text-gray-400">
+                {oneDownEnabled ? 'Включено (50% шанс)' : 'Выключено'}
+              </span>
+            </div>
+            <Skull className={`w-6 h-6 ml-auto ${oneDownEnabled ? 'text-red-500 fill-red-500/60 animate-pulse' : 'text-gray-500'}`} />
           </button>
         </div>
 
@@ -234,7 +282,15 @@ export default function Randomizer() {
                   }`} />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-gray-300/60 text-xs font-medium mb-2 uppercase tracking-wider">Сложность</h3>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-gray-300/60 text-xs font-medium uppercase tracking-wider">Сложность</h3>
+                    {result.isOneDown && (
+                      <div className="flex items-center gap-1.5 px-2 py-1 bg-red-500/20 rounded-full border border-red-500/30">
+                        <Skull className="w-3.5 h-3.5 text-red-400 fill-red-500/60 animate-pulse" />
+                        <span className="text-xs font-bold text-red-300">Одно падение</span>
+                      </div>
+                    )}
+                  </div>
                   <div className="flex items-center gap-3 flex-wrap">
                     <p className={`text-2xl font-bold ${
                       result.difficulty.color === 'green' ? 'text-green-300' :
@@ -246,11 +302,13 @@ export default function Randomizer() {
                     </p>
                     <div className="flex gap-1.5">
                       {[...Array(result.difficulty.skulls)].map((_, i) => (
-                        <div key={i} className="relative" title={isOneDown && i === 5 ? "Одно падение" : undefined}>
+                        <div key={i} className="relative">
                           <Skull className={`w-5 h-5 ${
-                            isOneDown ? 'text-red-500 fill-red-500/60 animate-pulse' : 'text-gray-400 fill-gray-400/30'
+                            result.isOneDown ? 'text-red-500 fill-red-500/60 animate-pulse' :
+                            result.difficulty.color === 'red' ? 'text-red-400 fill-red-500/30' :
+                            'text-gray-400 fill-gray-400/30'
                           }`} />
-                          {isOneDown && i === 5 && (
+                          {result.isOneDown && i === result.difficulty.skulls - 1 && (
                             <span className="absolute -top-1 -right-1 text-xs font-bold text-white bg-red-600 rounded-full w-4 h-4 flex items-center justify-center">
                               1
                             </span>
@@ -265,7 +323,7 @@ export default function Randomizer() {
                     }`}>
                       {result.difficulty.description}
                     </p>
-                    {isOneDown && (
+                    {result.isOneDown && (
                       <p className="text-xs text-red-300 mt-1">
                         <span className="font-semibold">Одно падение:</span> После возрождения вы не сможете восстановиться
                       </p>
