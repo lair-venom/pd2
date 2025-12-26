@@ -148,7 +148,7 @@ export default function Randomizer() {
       const selectedHeist = filteredHeists[Math.floor(Math.random() * filteredHeists.length)];
 
       // Решаем, будет ли включено "Одно падение"
-      const willHaveOneDown = oneDownEnabled && Math.random() < 0.3; // 30% шанс если включена галочка
+      const willHaveOneDown = oneDownEnabled && Math.random() < 0.2; // 20% шанс если включена галочка
 
       const newResult: Result = {
         difficulty: selectedDifficulty,
