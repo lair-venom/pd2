@@ -44,7 +44,7 @@ const difficulties = [
     name: 'Смертный приговор',
     skulls: 6,
     color: 'red',
-    description: 'Худший сценарий'
+    description: 'Вам пиздец'
   }
 ];
 
