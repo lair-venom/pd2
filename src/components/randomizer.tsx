@@ -65,11 +65,7 @@ const STORAGE_KEY = 'payday2-selected-heists';
 const STORAGE_KEY_DIFFICULTIES = 'payday2-selected-difficulties';
 const STORAGE_KEY_ONE_DOWN = 'payday2-one-down-enabled';
 
-interface RandomizerProps {
-  onSettingsToggle: (isOpen: boolean) => void;
-}
-
-export default function Randomizer({ onSettingsToggle }: RandomizerProps) {
+export default function Randomizer() {
   const [result, setResult] = useState<Result | null>(null);
   const [isRolling, setIsRolling] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -122,16 +118,6 @@ export default function Randomizer({ onSettingsToggle }: RandomizerProps) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(selected));
     localStorage.setItem(STORAGE_KEY_DIFFICULTIES, JSON.stringify(selectedDiffs));
     localStorage.setItem(STORAGE_KEY_ONE_DOWN, JSON.stringify(oneDownSetting));
-  };
-
-  const handleOpenSettings = () => {
-    setShowSettings(true);
-    onSettingsToggle(true);
-  };
-
-  const handleCloseSettings = () => {
-    setShowSettings(false);
-    onSettingsToggle(false);
   };
 
   const randomize = () => {
@@ -217,7 +203,7 @@ export default function Randomizer({ onSettingsToggle }: RandomizerProps) {
           </button>
 
           <button
-            onClick={handleOpenSettings}
+            onClick={() => setShowSettings(true)}
             className="group relative w-full px-6 py-4 bg-[#2a2a32] hover:bg-[#32323a] border border-orange-500/30 hover:border-orange-500/50 rounded-xl transition-all duration-300 flex items-center justify-center gap-3"
             title="Настройки миссий и сложности"
           >
@@ -375,7 +361,7 @@ export default function Randomizer({ onSettingsToggle }: RandomizerProps) {
         <Settings
           heists={heists}
           difficulties={difficulties}
-          onClose={handleCloseSettings}
+          onClose={() => setShowSettings(false)}
           onSave={handleSaveSettings}
           initialSelected={selectedHeists}
           initialDifficulties={selectedDifficulties}
