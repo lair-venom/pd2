@@ -29,7 +29,7 @@ function App() {
 
       {/* Футер всегда отображается, но иконка может быть скрыта */}
       <footer className="relative z-10 mt-16 text-center">
-        <div className={`transition-all duration-300 ${isSettingsOpen ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+        <div className={`transition-all duration-300 ${isSettingsOpen ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'}`}>
           <a
             href="https://discord.gg/u8sEmS3s9b"
             target="_blank"
