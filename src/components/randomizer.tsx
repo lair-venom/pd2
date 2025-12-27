@@ -130,21 +130,28 @@ export default function Randomizer() {
     setTimeout(() => {
       const availableDifficulties = difficulties.filter(d => selectedDifficulties.includes(d.name));
       const selectedDifficulty = availableDifficulties[Math.floor(Math.random() * availableDifficulties.length)];
-      const selectedApproach = approaches[Math.floor(Math.random() * approaches.length)];
 
       const availableHeistsList = heists.filter(h => selectedHeists.includes(h.name));
+      
+      // Сначала выбираем случайный подход
+      const selectedApproach = approaches[Math.floor(Math.random() * approaches.length)];
+      
+      // Фильтруем ограбления под выбранный подход
       let filteredHeists = availableHeistsList;
-
+      
       if (selectedApproach.value !== 'any') {
+        // Для подхода "скрытность" или "громко" выбираем только те ограбления, 
+        // которые поддерживают этот подход или "любой" подход
         filteredHeists = availableHeistsList.filter(h =>
           h.approach === 'any' || h.approach === selectedApproach.value
         );
       }
-
+      
+      // Если после фильтрации нет подходящих ограблений, выбираем из всех доступных
       if (filteredHeists.length === 0) {
         filteredHeists = availableHeistsList;
       }
-
+      
       const selectedHeist = filteredHeists[Math.floor(Math.random() * filteredHeists.length)];
 
       // Решаем, будет ли включено "Одно падение"
@@ -166,6 +173,15 @@ export default function Randomizer() {
         setTimeout(() => setShowOneDownEffect(false), 2000);
       }
     }, 1000);
+  };
+
+  const getApproachForResult = (heist: Heist, selectedApproach: { name: string; icon: string; value: string }) => {
+    // Если ограбление поддерживает только определенный подход, показываем его
+    if (heist.approach === 'stealth' || heist.approach === 'loud') {
+      return approaches.find(a => a.value === heist.approach) || selectedApproach;
+    }
+    // Иначе показываем выбранный подход
+    return selectedApproach;
   };
 
   return (
@@ -333,9 +349,9 @@ export default function Randomizer() {
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-50"></div>
               <div className="relative flex items-center gap-4">
                 <div className="p-3 bg-purple-500/10 rounded-lg border border-purple-500/30">
-                  {result.approach.value === 'stealth' ? (
+                  {getApproachForResult(result.heist, result.approach).value === 'stealth' ? (
                     <Shield className="w-7 h-7 text-purple-400" />
-                  ) : result.approach.value === 'loud' ? (
+                  ) : getApproachForResult(result.heist, result.approach).value === 'loud' ? (
                     <Volume2 className="w-7 h-7 text-purple-400" />
                   ) : (
                     <Home className="w-7 h-7 text-purple-400" />
@@ -343,7 +359,14 @@ export default function Randomizer() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-gray-300/60 text-xs font-medium mb-2 uppercase tracking-wider">Выбранный подход</h3>
-                  <p className="text-2xl font-bold text-white">{result.approach.name}</p>
+                  <p className="text-2xl font-bold text-white">
+                    {getApproachForResult(result.heist, result.approach).name}
+                  </p>
+                  {result.heist.approach !== 'any' && result.heist.approach !== getApproachForResult(result.heist, result.approach).value && (
+                    <p className="text-sm text-gray-400 mt-2">
+                      Ограбление поддерживает только {result.heist.approach === 'stealth' ? 'скрытность' : 'громкий подход'}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
