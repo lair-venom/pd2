@@ -23,14 +23,13 @@ function App() {
         </div>
 
         <div className="flex justify-center">
-          {/* Передаем функцию для обновления состояния настроек */}
           <Randomizer onSettingsToggle={setIsSettingsOpen} />
         </div>
       </div>
 
-      {/* Условный рендеринг иконки Discord */}
-      {!isSettingsOpen && (
-        <footer className="relative z-10 mt-16 text-center">
+      {/* Футер всегда отображается, но иконка может быть скрыта */}
+      <footer className="relative z-10 mt-16 text-center">
+        <div className={`transition-all duration-300 ${isSettingsOpen ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
           <a
             href="https://discord.gg/u8sEmS3s9b"
             target="_blank"
@@ -47,8 +46,8 @@ function App() {
               </div>
             </div>
           </a>
-        </footer>
-      )}
+        </div>
+      </footer>
     </div>
   );
 }
