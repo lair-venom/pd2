@@ -65,7 +65,11 @@ const STORAGE_KEY = 'payday2-selected-heists';
 const STORAGE_KEY_DIFFICULTIES = 'payday2-selected-difficulties';
 const STORAGE_KEY_ONE_DOWN = 'payday2-one-down-enabled';
 
-export default function Randomizer() {
+interface RandomizerProps {
+  onSettingsChange?: (isOpen: boolean) => void;
+}
+
+export default function Randomizer({ onSettingsChange }: RandomizerProps) {
   const [result, setResult] = useState<Result | null>(null);
   const [isRolling, setIsRolling] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -203,7 +207,10 @@ export default function Randomizer() {
           </button>
 
           <button
-            onClick={() => setShowSettings(true)}
+            onClick={() => {
+              setShowSettings(true);
+              onSettingsChange?.(true);
+            }}
             className="group relative w-full px-6 py-4 bg-[#2a2a32] hover:bg-[#32323a] border border-orange-500/30 hover:border-orange-500/50 rounded-xl transition-all duration-300 flex items-center justify-center gap-3"
             title="Настройки миссий и сложности"
           >
@@ -219,8 +226,8 @@ export default function Randomizer() {
         </div>
 
         {(selectedHeists.length === 0 || selectedDifficulties.length === 0) && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-center">
-            <p className="text-red-300">
+          <div className="mb-6 p-4 bg-orange-500/10 border border-orange-500/30 rounded-xl text-center">
+            <p className="text-orange-300">
               {selectedHeists.length === 0 && selectedDifficulties.length === 0
                 ? 'Выберите миссии и сложность в настройках'
                 : selectedHeists.length === 0
@@ -361,7 +368,10 @@ export default function Randomizer() {
         <Settings
           heists={heists}
           difficulties={difficulties}
-          onClose={() => setShowSettings(false)}
+          onClose={() => {
+            setShowSettings(false);
+            onSettingsChange?.(false);
+          }}
           onSave={handleSaveSettings}
           initialSelected={selectedHeists}
           initialDifficulties={selectedDifficulties}
