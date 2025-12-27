@@ -266,8 +266,7 @@ export default function Settings({
                         <div className="font-medium text-white">{heist.name}</div>
                         <div className="text-xs text-orange-300/50 mt-0.5">
                           {heist.approach === 'stealth' ? 'Только скрытность' :
-                           heist.approach === 'loud' ? 'Только громко' : 
-                           heist.approach === 'any' ? 'Любой подход' :}
+                           heist.approach === 'loud' ? 'Только громко' : 'Любой подход'}
                         </div>
                       </div>
                     </button>

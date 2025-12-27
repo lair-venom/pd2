@@ -147,13 +147,19 @@ export default function Randomizer() {
 
       const selectedHeist = filteredHeists[Math.floor(Math.random() * filteredHeists.length)];
 
-      // Решаем, будет ли включено "Одно падение"
-      const willHaveOneDown = oneDownEnabled && Math.random() < 0.2; // 20% шанс если включена галочка
+      let finalApproach = selectedApproach;
+      if (selectedHeist.approach === 'stealth') {
+        finalApproach = approaches.find(a => a.value === 'stealth')!;
+      } else if (selectedHeist.approach === 'loud') {
+        finalApproach = approaches.find(a => a.value === 'loud')!;
+      }
+
+      const willHaveOneDown = oneDownEnabled && Math.random() < 0.2;
 
       const newResult: Result = {
         difficulty: selectedDifficulty,
         heist: selectedHeist,
-        approach: selectedApproach,
+        approach: finalApproach,
         isOneDown: willHaveOneDown
       };
 
