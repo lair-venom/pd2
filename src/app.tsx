@@ -3,7 +3,6 @@ import Logo from './components/logo';
 import Randomizer from './components/randomizer';
 
 function App() {
-  // Состояние для отслеживания открытия настроек
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   return (
