@@ -158,7 +158,7 @@ export default function Randomizer({ onSettingsChange }: RandomizerProps) {
         finalApproach = approaches.find(a => a.value === 'loud')!;
       }
 
-      const willHaveOneDown = oneDownEnabled && Math.random() < 0.99;
+      const willHaveOneDown = oneDownEnabled && Math.random() < 0.35;
 
       const newResult: Result = {
         difficulty: selectedDifficulty,
