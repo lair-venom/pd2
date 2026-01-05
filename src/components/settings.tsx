@@ -172,7 +172,7 @@ export default function Settings({
                       <span className="font-bold text-lg text-white">Одно падение</span>
                       {oneDownEnabled && (
                         <span className="px-2 py-0.5 bg-red-500/20 text-red-300 text-xs font-bold rounded-full border border-red-500/30">
-                          99% шанс
+                          20% шанс
                         </span>
                       )}
                     </div>
